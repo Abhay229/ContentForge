@@ -1,0 +1,16 @@
+crewai>=0.114.0
+crewai-tools>=0.38.0
+python-dotenv>=1.0.1
+pydantic>=2.6.0
+
+# Free web/news search (no API key)
+ddgs>=9.0.0
+
+# Free Google Trends client (no API key)
+pytrends>=4.9.2
+
+# Free local readability scoring (no API key)
+textstat>=0.7.4
+
+# Dashboard UI
+streamlit>=1.38.0
