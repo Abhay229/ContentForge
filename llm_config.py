@@ -20,6 +20,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+try:
+    import crewai.llms.cache as _crewai_cache
+    _crewai_cache.mark_cache_breakpoint = lambda msg: msg
+except Exception:
+    pass
 
 def get_llm() -> LLM:
     """Return a configured, free-tier LLM instance based on LLM_PROVIDER."""
