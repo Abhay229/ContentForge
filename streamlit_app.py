@@ -14,6 +14,7 @@ from pathlib import Path
 import streamlit as st
 
 from main import (
+    cooldown,
     research_crew,
     review_crew,
     run_crew_task,
@@ -85,22 +86,29 @@ if submitted:
             status.write("🔎 Phase 1: Topic Research...")
             run_crew_task(research_crew, pipeline_input, "Topic Research")
             progress.progress(20, text="Research complete")
+            status.write("⏸️ Cooling down briefly to respect free-tier rate limits...")
+            cooldown()
 
             status.write("✍️ Phase 2: Content Writing...")
             run_crew_task(writer_crew, pipeline_input, "Content Writing")
             progress.progress(45, text="Draft complete")
+            status.write("⏸️ Cooling down briefly to respect free-tier rate limits...")
+            cooldown()
 
-            status.write("⚡ Phase 3: SEO Optimization & Quality Review (parallel)...")
+            status.write("⚡ Phase 3: SEO Optimization & Quality Review (parallel, staggered)...")
             with ThreadPoolExecutor(max_workers=2) as executor:
                 seo_future = executor.submit(
                     run_crew_task, seo_crew, pipeline_input, "SEO Optimization"
                 )
+                cooldown(seconds=8, reason="staggering parallel start")
                 review_future = executor.submit(
                     run_crew_task, review_crew, pipeline_input, "Quality Review"
                 )
                 seo_future.result()
                 review_future.result()
             progress.progress(75, text="SEO + Review complete")
+            status.write("⏸️ Cooling down briefly to respect free-tier rate limits...")
+            cooldown()
 
             status.write("📱 Phase 4: Social Media Adaptation...")
             run_crew_task(social_crew, pipeline_input, "Social Media Adaptation")

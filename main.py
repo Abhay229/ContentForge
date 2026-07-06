@@ -1,8 +1,10 @@
 import argparse
+import os
 import time
 from concurrent.futures import ThreadPoolExecutor
 
 from crewai import Crew, Process
+from dotenv import load_dotenv
 
 from agents import (
     content_writer,
@@ -19,6 +21,17 @@ from tasks import (
     write_content_task,
 )
 
+load_dotenv()
+
+PHASE_COOLDOWN_SECONDS = float(os.getenv("PHASE_COOLDOWN_SECONDS", "12"))
+
+
+def cooldown(seconds: float = PHASE_COOLDOWN_SECONDS, reason: str = ""):
+    if seconds <= 0:
+        return
+    label = f" ({reason})" if reason else ""
+    print(f"⏸️  Cooling down {seconds:.0f}s to respect free-tier rate limits{label}...")
+    time.sleep(seconds)
 # ---------------------------------------------------------------------------
 # Crews - one crew per stage so we can control sequencing & parallelism
 # ---------------------------------------------------------------------------
@@ -81,28 +94,27 @@ def run_pipeline(pipeline_input):
     """Run the full content pipeline, parallelizing SEO + Quality Review."""
     timings = {}
 
-    # Phase 1: Topic Research
     print("\n🔎 Phase 1: Topic Research...")
     t0 = time.time()
     run_crew_task(research_crew, pipeline_input, "Topic Research")
     timings["research"] = time.time() - t0
     print(f"✅ Phase 1 completed in {timings['research']:.2f}s")
+    cooldown(reason="before writing")
 
-    # Phase 2: Content Writing (depends on research)
     print("\n✍️  Phase 2: Content Writing...")
     t0 = time.time()
     run_crew_task(writer_crew, pipeline_input, "Content Writing")
     timings["writing"] = time.time() - t0
     print(f"✅ Phase 2 completed in {timings['writing']:.2f}s")
+    cooldown(reason="before SEO + review")
 
-    # Phase 3: SEO Optimization + Quality Review IN PARALLEL (both depend
-    # only on the draft, not on each other)
-    print("\n⚡ Phase 3: SEO Optimization & Quality Review (parallel)...")
+    print("\n⚡ Phase 3: SEO Optimization & Quality Review (parallel, staggered)...")
     t0 = time.time()
     with ThreadPoolExecutor(max_workers=2) as executor:
         seo_future = executor.submit(
             run_crew_task, seo_crew, pipeline_input, "SEO Optimization"
         )
+        cooldown(seconds=min(PHASE_COOLDOWN_SECONDS, 8), reason="staggering parallel start")
         review_future = executor.submit(
             run_crew_task, review_crew, pipeline_input, "Quality Review"
         )
@@ -110,8 +122,8 @@ def run_pipeline(pipeline_input):
         review_future.result()
     timings["seo_and_review_parallel"] = time.time() - t0
     print(f"✅ Phase 3 completed in {timings['seo_and_review_parallel']:.2f}s")
+    cooldown(reason="before social adaptation")
 
-    # Phase 4: Social Media Adaptation (depends on Phase 3 results)
     print("\n📱 Phase 4: Social Media Adaptation...")
     t0 = time.time()
     run_crew_task(social_crew, pipeline_input, "Social Media Adaptation")
