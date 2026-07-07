@@ -30,19 +30,40 @@ The pipeline is split into four execution phases powered by five specialized age
 4. Social Media Adapter repurposes the reviewed content into platform-specific posts.
 
 ```text
-Topic Researcher
-        |
-        v
-Content Writer
-        |
-        v
-+---------------------------+
-| SEO Optimizer            |
-| Quality Reviewer         |   <- parallel phase
-+---------------------------+
-        |
-        v
-Social Media Adapter
+Input: topic + industry + audience
+                 |
+                 v
+     +---------------------------+
+     |      Topic Researcher     |
+     |   Trends, keywords, news  |
+     +---------------------------+
+                 |
+                 v
+     +---------------------------+
+     |       Content Writer      |
+     |     Drafts the article    |
+     +---------------------------+
+                 |
+        Runs in parallel
+          /             \
+         v               v
++----------------+   +-------------------+
+| SEO Optimizer  |   | Quality Reviewer  |
+| Keywords, meta |   | Accuracy & tone   |
+| and SEO output |   | check             |
++----------------+   +-------------------+
+          \             /
+           v           v
+     +---------------------------+
+     |    Social Media Adapter   |
+     |  Twitter, LinkedIn, IG,   |
+     |            FB             |
+     +---------------------------+
+                 |
+                 v
+ Output: article + social media pack
+
+[Parallel phase] SEO Optimizer + Quality Reviewer run concurrently
 ```
 
 The parallel section is deliberate. SEO optimization and quality review both depend on the written draft, but neither depends on the other. In `main.py`, they are launched with `ThreadPoolExecutor`, and the second task is slightly staggered to reduce pressure on free-tier limits. That shortens wall-clock runtime without compromising the logical order of the workflow.
