@@ -29,9 +29,9 @@ topic_researcher = Agent(
         "your research tools rather than guessing."
     ),
     llm=llm,
-    verbose=True,
+    verbose=False,
     tools=[web_search, news_search, get_trending_keywords],
-    max_iter=6,
+    max_iter=3,
     max_rpm=15,
     max_execution_time=420,
     respect_context_window=True,
@@ -55,9 +55,9 @@ content_writer = Agent(
         "inventing facts."
     ),
     llm=llm,
-    verbose=True,
+    verbose=False,
     tools=[],
-    max_iter=5,
+    max_iter=3,
     max_rpm=15,
     max_execution_time=480,
     respect_context_window=True,
@@ -81,11 +81,11 @@ seo_optimizer = Agent(
         "real readability and keyword-density data rather than intuition."
     ),
     llm=llm,
-    verbose=True,
-    tools=[check_keyword_density, analyze_readability, get_trending_keywords],
-    max_iter=5,
-    max_rpm=12,
-    max_execution_time=360,
+    verbose=False,
+    tools=[ get_trending_keywords],
+    max_iter=2,
+    max_rpm=25,
+    max_execution_time=600,
     respect_context_window=True,
 )
 
@@ -107,9 +107,9 @@ social_media_adapter = Agent(
         "and you write each one natively rather than just copy-pasting."
     ),
     llm=llm,
-    verbose=True,
+    verbose=False,
     tools=[],
-    max_iter=5,
+    max_iter=2,
     max_rpm=15,
     max_execution_time=360,
     respect_context_window=True,
@@ -132,10 +132,10 @@ quality_reviewer = Agent(
         "ready to publish."
     ),
     llm=llm,
-    verbose=True,
-    tools=[web_search, analyze_readability],
-    max_iter=5,
+    verbose=False,
+    tools=[web_search],
+    max_iter=2,
     max_rpm=12,
-    max_execution_time=360,
+    max_execution_time=480,
     respect_context_window=True,
 )

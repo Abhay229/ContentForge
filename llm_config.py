@@ -51,7 +51,7 @@ def get_llm() -> LLM:
         return LLM(
             model=os.getenv("OLLAMA_MODEL", "ollama/llama3.1"),
             base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
-            temperature=0.7,
+            temperature=0.3,
         )
 
     raise ValueError(

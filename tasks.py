@@ -26,7 +26,7 @@ class SEOReport(BaseModel):
     meta_description: str = Field(description="Meta description (under 160 chars)")
     primary_keyword: str = Field(description="Primary target keyword")
     secondary_keywords: List[str] = Field(description="Supporting keywords")
-    seo_score: float = Field(description="Overall SEO score 0-100")
+    
     recommendations: List[str] = Field(description="Further SEO recommendations")
 
 
@@ -116,17 +116,30 @@ write_content_task = Task(
 )
 
 seo_optimize_task = Task(
-    description=(
-        "Optimize the draft article for search engines. Refine the title and "
-        "add a meta description, identify the primary and secondary keywords, "
-        "check keyword density and readability using your tools, and give an "
-        "overall SEO score with concrete recommendations. Do not sacrifice "
-        "readability for keyword stuffing."
-    ),
+    
+        description=(
+    "Optimize the draft article for search engines by improving its SEO while "
+    "maintaining readability and natural writing.\n\n"
+    "Your tasks are:\n"
+    "1. Improve the article title for SEO.\n"
+    "2. Improve headings where necessary.\n"
+    "3. Write a compelling meta description (maximum 160 characters).\n"
+    "4. Identify one primary keyword.\n"
+    "5. Suggest up to five relevant secondary keywords.\n"
+    "6. Naturally incorporate the keywords into the content where appropriate.\n"
+    "7. Provide three concise and actionable SEO recommendations.\n\n"
+    "Do not calculate keyword density.\n"
+    "Do not perform readability analysis.\n"
+    "Do not generate a numerical SEO score.\n"
+    "Do not overuse keywords or perform keyword stuffing.\n"
+    "Focus on producing content that is useful, engaging, and optimized for both readers and search engines."
+),
+    
     expected_output=(
-        "A structured SEO report with optimized title, meta description, "
-        "primary/secondary keywords, SEO score, and recommendations."
-    ),
+    "A structured SEO report containing an optimized title, a meta description, "
+    "one primary keyword, up to five secondary keywords, and three actionable "
+    "SEO recommendations."
+),
     agent=seo_optimizer,
     context=[write_content_task],
     output_pydantic=SEOReport,

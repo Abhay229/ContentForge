@@ -60,7 +60,7 @@ seo_crew = Crew(
     verbose=True,
     process=Process.sequential,
     cache=True,
-    max_rpm=12,
+    max_rpm=25,
 )
 
 review_crew = Crew(
@@ -69,7 +69,7 @@ review_crew = Crew(
     verbose=True,
     process=Process.sequential,
     cache=True,
-    max_rpm=12,
+    max_rpm=25,
 )
 
 social_crew = Crew(
